@@ -18,14 +18,15 @@ I am here to echo your kind words back to you. Just say anything nice and I'll s
 def set_balance(message):
     balance_amt = float(message.text.split(' ', 1)[1])
 
-    db_methods.insert_data(db_methods.conn, balance_amt)
+    db_methods.insert_data(db_methods.conn, balance_amt, user_id=message.from_user.id)
     bot.reply_to(message, f"Баланс {balance_amt} успешно установлен") #добавить селект из бд и проверку, что баланс установлен корректно
 
 
 #Подумать о том как вводить баланс впервый раз
 @bot.message_handler(regexp='[-+]\d+')
 def calc(message):
-    balance_amt = db_methods.select_balance(db_methods.conn)
+    user_id = message.from_user.id
+    balance_amt = db_methods.select_balance(db_methods.conn, user_id)
 
     if ' ' in message.text:
         transaction_amt, transaction_desc = message.text.split(' ', 1)
@@ -35,10 +36,9 @@ def calc(message):
 
     transaction_amt = transaction_amt.replace(',', '.')
     balance_amt += float(transaction_amt)
-    user_id = message.from_user.id
-
+    
     db_methods.insert_data(db_methods.conn, balance_amt, user_id, transaction_amt, transaction_desc)
-    bot.reply_to(message, f"Остаток: {balance_amt}")
+    bot.reply_to(message, f"<b>{message.from_user.first_name}</b> Остаток: {balance_amt}", parse_mode='HTML')
 
 
 # Handle all other messages with content_type 'text' (content_types defaults to ['text'])
