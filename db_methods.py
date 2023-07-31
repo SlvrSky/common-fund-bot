@@ -11,9 +11,10 @@ def insert_data(conn, balance_amt, user_id = -1, transaction_amt = -1, transacti
     conn.commit()
 
 
-def select_balance(conn):
+def select_balance(conn, user_id):
     cursor = conn.cursor()
-    cursor.execute(f'''SELECT balance_amt FROM {TABLE_NM}
+    cursor.execute(f'''SELECT balance_amt, user_id FROM {TABLE_NM}
+                       WHERE user_id = {user_id}
                        ORDER BY transaction_dttm DESC
                        LIMIT 1''')
     return cursor.fetchone()[0]
